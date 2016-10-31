@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Thivers rad</title>
+</head>
+<body>
+
+<canvas id='canvas' width='800' height='300'></canvas>
+
+<script>
+	window.onload = function(){
+
+		var canvas = document.getElementById( 'canvas' ),
+			c = canvas.getContext( '2d' );
+
+			/* Clear rect */
+			function clearContext(){
+				c.fillStyle = 'black';
+				c.fillRect( 0, 0, canvas.width, canvas.height );
+			}			
+
+			/* Flight rect */
+			function MotionRect( x, y, angle, power ){
+				this.x = x;
+				this.y = y;
+				this.power = power;
+				this.angle = angle;
+				this.speedX = 1;
+				this.speedY = 5;
+
+				if( this.angle == 1 ) this.speedX = 2;
+				else if( this.angle == 2 ) this.speedX = 3;
+				else if( this.angle == 3 ) this.speedX = 4;
+				else if( this.angle == 4 ) this.speedX = 5;
+				else if( this.angle == 5 ) this.speedX = 6;
+				else if( this.angle == 6 ) this.speedX = 7;
+				else if( this.angle == 7 ) this.speedX = 8;
+				else if( this.angle == 8 ) this.speedX = 9;
+				else if( this.angle == 9 ) this.speedX = 10;
+				else if( this.angle == 10 ) this.speedX = 11;
+				
+				this.gravity = 0.2;
+			}
+
+			MotionRect.prototype.powerFlight = function(){
+				this.x += this.speedX;
+				this.y -= this.speedY;
+
+				if( this.power == 1 ){
+					if( this.x >= 20 ){
+						this.speedY -= this.gravity;
+					}
+				} else if( this.power == 2 ){
+					if( this.x >= 40 ){
+						this.speedY -= this.gravity;
+					}
+				} else if( this.power == 3 ){
+					if( this.x >= 60 ){
+						this.speedY -= this.gravity;
+					}
+				} else if( this.power == 4 ){
+					if( this.x >= 80 ){
+						this.speedY -= this.gravity;
+					}
+				} else if( this.power == 5 ){
+					if( this.x >= 100 ){
+						this.speedY -= this.gravity;
+					}
+				} else if( this.power == 6 ){
+					if( this.x >= 120 ){
+						this.speedY -= this.gravity;
+					}
+				} else if( this.power == 7 ){
+					if( this.x >= 140 ){
+						this.speedY -= this.gravity;
+					}
+				} else if( this.power == 8 ){
+					if( this.x >= 160 ){
+						this.speedY -= this.gravity;
+					}
+				} else if( this.power == 9 ){
+					if( this.x >= 180 ){
+						this.speedY -= this.gravity;
+					}
+				} else if( this.power == 10 ){
+					if( this.x >= 200 ){
+						this.speedY -= this.gravity;
+					}
+				}
+
+				c.fillStyle = '#fff';
+				c.fillRect( this.x, this.y, 5, 5 );
+				c.fill();
+			}
+
+			clearContext();
+			var flight = new MotionRect( 0, canvas.height, 10, 6 );		
+
+			setInterval( function(){
+				clearContext();
+				flight.powerFlight();				
+			},30 );
+			
+
+
+
+
+
+	}
+</script>
+	
+</body>
+</html>
