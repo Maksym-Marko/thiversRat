@@ -9,7 +9,8 @@ window.onload = function(){
 		TWO_PI = Math.PI * 2,
 		SightX = 0,
 		SightY = 0,
-		SightSize = 15;
+		SightSize = 15,
+		angleSight = 15;
 
 	/* Clear rect */
 	function clearContext(){
@@ -145,8 +146,7 @@ window.onload = function(){
 	clearContext();
 
 	var mechanismAngle = new MechanismAngle( 0, canvas.height, 100 );
-
-	mechanismAngle.createMechanismAngle( 5 );
+		
 
 	function PositionMouse( e ){
 		return{
@@ -165,8 +165,32 @@ window.onload = function(){
 		){
 			console.log( 0 );
 		} else{
-			console.log( '1!' );
+			canvas.onmousemove = function(){
+
+				clearContext();
+				mouseXin = event.pageY - canvasTop;
+				if( mouseXin < SightY ){
+					angleSight--;
+					if( angleSight <= 1 ){
+						angleSight = 1;
+					}					
+				} else if( mouseXin > SightY ){
+					angleSight++;
+					if( angleSight >= 15 ){
+						angleSight = 15;
+					}
+				}				
+				mechanismAngle.createMechanismAngle( angleSight );
+			}			
 		}			
+	}
+
+	mechanismAngle.createMechanismAngle();
+
+	canvas.onmouseup = function(){
+		canvas.onmousemove = function(){
+			return;
+		}
 	}
 
 	/*************************************
@@ -195,13 +219,19 @@ window.onload = function(){
 		throwButton.onmouseup = function(){
 			if( keyShot == true ){
 				keyRect = true;
-				var flight = new MotionRect( 0, canvas.height, 10, changePower );
+				var flight = new MotionRect( 0, canvas.height, angleSight, changePower );
 				clearInterval( changePowerPeriod );
 				powerLine.style.width = '10px';
 				changePower = 0;
 				motionRect = setInterval( function(){
 					clearContext();
-					flight.powerFlight();
+					flight.powerFlight();					
+					mechanismAngle.createMechanismAngle( angleSight );
+					setTimeout( function(){
+						clearContext();
+						angleSight = 15;
+						mechanismAngle.createMechanismAngle( angleSight );
+					},500 );					
 				},30 );
 				keyShot = false;
 			}
