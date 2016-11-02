@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1" />
 	<title>Thivers rad</title>
 	<style>
-		canvas{
+		body, html, canvas{
 			user-select: none;
 		    -ms-user-select: none;
 		    -webkit-user-select: none;
@@ -65,6 +65,10 @@
 			background: linear-gradient(to right, rgba(68,224,54,1) 0%, rgba(68,224,54,1) 8%, rgba(245,67,22,1) 100%);
 			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#44e036', endColorstr='#f54316', GradientType=1 );
 		}
+		.mx-count{
+			float: right;
+			padding: 20px;
+		}
 	</style>
 </head>
 <body>
@@ -76,6 +80,10 @@
 		<span class="mx-power_line_wrap" id="mx-power_line">
 			<span></span>
 		</span>
+		<div class="mx-count">
+			<span>Крысы украли: <strong id="countEggs">0</strong> | </span>
+			<span>Рекорд: <strong id="recordEggs">0</strong></span>
+		</div>
 	</div>
 
 	<script src="ThiversRad.js"></script>	

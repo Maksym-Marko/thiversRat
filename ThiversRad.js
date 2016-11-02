@@ -18,6 +18,31 @@ window.onload = function(){
 		c.fillRect( 0, 0, canvas.width, canvas.height );
 	}
 
+	/*** Random number ***/
+	function RandomNumber( from, to ){
+		return Math.floor( ( Math.random() * ( to - from + 1 ) ) + from );
+	}
+
+/*******************************************************************************
+**************************** Dgaw rad-catch ************************************
+********************************************************************************/
+
+	var countEggs = document.getElementById( 'countEggs' ),
+		recordEggs = document.getElementById( 'recordEggs' ),
+		countEggsNum = countEggs.innerHTML,
+		recordEggsNum = recordEggs.innerHTML;
+
+		_posCatchRadX = canvas.width + 10,
+		_posCatchRadY = canvas.height - 30,
+		_posCatchRadW = 10,
+		_posCatchRadH = 30;
+
+	function dgawRadCatch( _posCatchRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH ){
+		c.fillStyle = '#fff';
+		c.fillRect( _posCatchRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH );
+		c.fill();
+	}
+
 /*******************************************************************************
 ************ The calculation of the angle of flight and power shots ************
 ********************************************************************************/
@@ -135,10 +160,26 @@ window.onload = function(){
 		c.fillRect( this.x, this.y, 5, 5 );
 		c.fill();
 
-		if( this.y > canvas.height ){
-			console.log( 'Упал' );
+		fieldCatchX = _posCatchRadX - 30,
+		fieldCatchSize = 30 + _posCatchRadW;
+
+		if( this.y > canvas.height && this.x < fieldCatchX ||
+			this.y > canvas.height && this.x > fieldCatchX + fieldCatchSize	){
+			console.log( 'Промах' );
 			clearInterval( motionRect );
 			keyRect = false;
+		} else{
+			if( this.y > canvas.height - _posCatchRadH - 30 && this.x > fieldCatchX && this.x < fieldCatchX + fieldCatchSize ){
+				console.log( 'Попал' );
+				clearInterval( motionRect );
+				keyRect = false;
+				countEggsNum++;
+				countEggs.innerHTML = countEggsNum;
+
+				if( recordEggsNum < countEggsNum ){
+					recordEggs.innerHTML = countEggsNum;
+				}
+			}		 	
 		}
 		
 	}
@@ -161,7 +202,11 @@ window.onload = function(){
 
 	/*** Directed to target ***/
 	function DirectedToTarget(){
-		canvas.onmousedown = function(){
+		/* draw rad */
+		dgawRadCatch( _posCatchRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH );
+
+		canvas.onmousedown = function(){			
+
 			var mousePosition = PositionMouse( event );
 
 			if( mousePosition.mouseX < SightX ||
@@ -174,6 +219,10 @@ window.onload = function(){
 				canvas.style.cursor = 'pointer';		
 				canvas.onmousemove = function(){		
 					clearContext();
+
+					/* draw rad */
+					dgawRadCatch( _posCatchRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH );
+
 					mouseXin = event.pageY - canvasTop;
 					if( mouseXin < SightY ){
 						angleSight--;
@@ -229,6 +278,14 @@ window.onload = function(){
 			}			
 		}
 
+		throwButton.onmouseleave = function(){
+			keyRect = false;
+			keyShot = false;
+			changePower = 0;
+			powerLine.style.width = '10px';
+			clearInterval( changePowerPeriod );
+		}
+
 		throwButton.onmouseup = function(){
 			if( keyShot == true ){
 				keyRect = true;
@@ -238,6 +295,10 @@ window.onload = function(){
 				changePower = 0;
 				motionRect = setInterval( function(){
 					clearContext();
+
+					/* draw rad */
+					dgawRadCatch( _posCatchRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH );
+
 					flight.powerFlight();					
 					mechanismAngle.createMechanismAngle( angleSight );
 					setTimeout( function(){
@@ -250,8 +311,59 @@ window.onload = function(){
 		}
 	}
 
-	/*** Init ***/
-	DirectedToTarget();			
-	Shot();
+/*******************************************************************************
+*********************************** Catch ***************************************
+********************************************************************************/	
+	var positionCatchRad = RandomNumber( 300, canvas.width - 20 ),
+		motionCatcher;
+
+
+
+	function PositionCatch( posCatchRadX ){
+		this.x = posCatchRadX;
+		this.posRadX = _posCatchRadX;
+	}
+
+	PositionCatch.prototype.catchMotion = function(){		
+
+		if( this.posRadX >= this.x ){
+			this.posRadX -= 14;
+		} else{
+			clearInterval( motionCatcher );
+			_posCatchRadX = this.posRadX;
+
+			/*** Sight ***/
+			DirectedToTarget();
+
+			/*** Shot ***/		
+			Shot();
+		}
+
+		dgawRadCatch( this.posRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH );
+	}
+
+	/*** Catch rad ***/	
+	function MotionRadFront(){
+		var rad = new PositionCatch( positionCatchRad );
+
+		motionCatcher = setInterval( function(){
+			clearContext();
+			rad.catchMotion();
+		},30 );
+	}
+
+	function MotionRadBack(){
+
+	}
+	
+
+/*******************************************************************************
+*********************************** Init ***************************************
+********************************************************************************/
+	function init(){
+		MotionRadFront();
+	}
+	
+	init();	
 
 }
