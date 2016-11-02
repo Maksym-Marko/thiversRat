@@ -12,15 +12,17 @@ window.onload = function(){
 		SightSize = 15,
 		angleSight = 15;
 
-	/* Clear rect */
+	/*** Clear rect ***/
 	function clearContext(){
 		c.fillStyle = 'black';
 		c.fillRect( 0, 0, canvas.width, canvas.height );
 	}
 
-	/*************************************
-	*	          Change angle
-	*************************************/
+/*******************************************************************************
+************ The calculation of the angle of flight and power shots ************
+********************************************************************************/
+
+	/*** Change angle ***/
 
 	function MechanismAngle( mX, mY, mRadius ){
 		this.x = mX;
@@ -32,7 +34,7 @@ window.onload = function(){
 		c.beginPath();
 		c.strokeStyle = '#fff';
 		c.arc( this.x, this.y, this.radius, 0, TWO_PI, false );
-		c.stroke();
+		//c.stroke();
 		c.closePath();
 
 		/* Sight */
@@ -51,9 +53,7 @@ window.onload = function(){
 
 	}
 
-	/*************************************
-	*            Flight rect
-	*************************************/
+	/*** Flight rect ***/
 	function MotionRect( x, y, angle, power ){
 		this.x = x;
 		this.y = y;
@@ -62,21 +62,21 @@ window.onload = function(){
 		this.speedX = 1;
 		this.speedY = 5;
 
-		if( this.angle == 1 ) this.speedX = 2;
-		else if( this.angle == 2 ) this.speedX = 3;
-		else if( this.angle == 3 ) this.speedX = 4;
-		else if( this.angle == 4 ) this.speedX = 5;
-		else if( this.angle == 5 ) this.speedX = 6;
-		else if( this.angle == 6 ) this.speedX = 7;
-		else if( this.angle == 7 ) this.speedX = 8;
-		else if( this.angle == 8 ) this.speedX = 9;
-		else if( this.angle == 9 ) this.speedX = 10;
-		else if( this.angle == 10 ) this.speedX = 11;
-		else if( this.angle == 11 ) this.speedX = 12;
-		else if( this.angle == 12 ) this.speedX = 13;
-		else if( this.angle == 13 ) this.speedX = 14;
-		else if( this.angle == 14 ) this.speedX = 15;
-		else if( this.angle == 15 ) this.speedX = 16;
+		if( this.angle == 1 ) this.speedX = 1;
+		else if( this.angle == 2 ) this.speedX = 2;
+		else if( this.angle == 3 ) this.speedX = 3;
+		else if( this.angle == 4 ) this.speedX = 4;
+		else if( this.angle == 5 ) this.speedX = 5;
+		else if( this.angle == 6 ) this.speedX = 6;
+		else if( this.angle == 7 ) this.speedX = 7;
+		else if( this.angle == 8 ) this.speedX = 8;
+		else if( this.angle == 9 ) this.speedX = 9;
+		else if( this.angle == 10 ) this.speedX = 10;
+		else if( this.angle == 11 ) this.speedX = 11;
+		else if( this.angle == 12 ) this.speedX = 12;
+		else if( this.angle == 13 ) this.speedX = 13;
+		else if( this.angle == 14 ) this.speedX = 14;
+		else if( this.angle == 15 ) this.speedX = 15;
 		
 		this.gravity = 0.2;
 	}
@@ -145,9 +145,13 @@ window.onload = function(){
 
 	clearContext();
 
+/*******************************************************************************
+*********************************** SHOT ***************************************
+********************************************************************************/
+
 	var mechanismAngle = new MechanismAngle( 0, canvas.height, 100 );
 		
-
+	/*** Find sight ***/
 	function PositionMouse( e ){
 		return{
 			mouseX: e.pageX - canvasLeft,
@@ -155,47 +159,56 @@ window.onload = function(){
 		} 
 	}
 
-	canvas.onmousedown = function(){
-		var mousePosition = PositionMouse( event );
+	/*** Directed to target ***/
+	function DirectedToTarget(){
+		canvas.onmousedown = function(){
+			var mousePosition = PositionMouse( event );
 
-		if( mousePosition.mouseX < SightX ||
-			mousePosition.mouseX > SightX + SightSize ||
-			mousePosition.mouseY < SightY ||
-			mousePosition.mouseY > SightY + SightSize
-		){
-			console.log( 0 );
-		} else{
-			canvas.onmousemove = function(){
-
-				clearContext();
-				mouseXin = event.pageY - canvasTop;
-				if( mouseXin < SightY ){
-					angleSight--;
-					if( angleSight <= 1 ){
-						angleSight = 1;
-					}					
-				} else if( mouseXin > SightY ){
-					angleSight++;
-					if( angleSight >= 15 ){
-						angleSight = 15;
+			if( mousePosition.mouseX < SightX ||
+				mousePosition.mouseX > SightX + SightSize ||
+				mousePosition.mouseY < SightY ||
+				mousePosition.mouseY > SightY + SightSize
+			){
+				console.log( 0 );
+			} else{
+				canvas.style.cursor = 'pointer';		
+				canvas.onmousemove = function(){		
+					clearContext();
+					mouseXin = event.pageY - canvasTop;
+					if( mouseXin < SightY ){
+						angleSight--;
+						if( angleSight <= 2 ){
+							angleSight = 2;
+						}					
+					} else if( mouseXin > SightY ){
+						angleSight++;
+						if( angleSight >= 15 ){
+							angleSight = 15;
+						}
+					}				
+					mechanismAngle.createMechanismAngle( angleSight );
+				}
+				canvas.onmouseleave = function(){
+					canvas.style.cursor = 'default';
+					canvas.onmousemove = function(){					
+						return;
 					}
-				}				
-				mechanismAngle.createMechanismAngle( angleSight );
+				}		
 			}			
-		}			
-	}
+		}
 
-	mechanismAngle.createMechanismAngle();
+		mechanismAngle.createMechanismAngle();
 
-	canvas.onmouseup = function(){
-		canvas.onmousemove = function(){
-			return;
+		canvas.onmouseup = function(){
+			canvas.style.cursor = 'default';
+			canvas.onmousemove = function(){
+				return;
+			}
 		}
 	}
+	
 
-	/*************************************
-	*            Shot
-	*************************************/
+	/*** Shot ***/
 	var throwButton = document.getElementById( 'mx-throw' ),
 		powerLine = document.getElementById( 'mx-power_line' ),
 		powerSize = 10,
@@ -228,7 +241,6 @@ window.onload = function(){
 					flight.powerFlight();					
 					mechanismAngle.createMechanismAngle( angleSight );
 					setTimeout( function(){
-						clearContext();
 						angleSight = 15;
 						mechanismAngle.createMechanismAngle( angleSight );
 					},500 );					
@@ -237,7 +249,9 @@ window.onload = function(){
 			}
 		}
 	}
-				
+
+	/*** Init ***/
+	DirectedToTarget();			
 	Shot();
 
 }
