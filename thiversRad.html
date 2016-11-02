@@ -14,11 +14,13 @@
 		    -webkit-touch-callout: none;
 		    -webkit-user-drag: none;
 		}
+		#mxControlPanel{
+			display: none;
+		}
 		.mx-control_panel{
-			display: block;
 			padding: 5px;
-			width: 800px;
-			background-color: #BBB3D1;			
+			width: 900px;
+			background-color: #d0cbc7;			
 			float: left;
 		}
 		.mx-control_panel > span{
@@ -69,20 +71,35 @@
 			float: right;
 			padding: 20px;
 		}
+		.mx-control_panel #mx-dist{
+			width: 100%;
+			height: 100%;
+
+		}
+		#mxStart{
+			padding: 20px;
+			font-size: 20px;
+			display: table;
+			background-color: green;
+			color: #fff;
+			cursor: pointer;
+		}
 	</style>
 </head>
 <body>
 
 	<canvas id='canvas' width='900' height='400'></canvas>
 
-	<div class="mx-control_panel">
+	<span id="mxStart">START</span>
+	<div class="mx-control_panel" id="mxControlPanel">		
 		<span id="mx-throw">Бросить</span>
 		<span class="mx-power_line_wrap" id="mx-power_line">
 			<span></span>
 		</span>
 		<div class="mx-count">
 			<span>Крысы украли: <strong id="countEggs">0</strong> | </span>
-			<span>Рекорд: <strong id="recordEggs">0</strong></span>
+			<span>Рекорд: <strong id="recordEggs">0</strong> | </span>
+			<span>Осталось: <strong id="timeCount">0</strong></span>
 		</div>
 	</div>
 

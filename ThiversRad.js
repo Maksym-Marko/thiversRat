@@ -30,11 +30,12 @@ window.onload = function(){
 	var countEggs = document.getElementById( 'countEggs' ),
 		recordEggs = document.getElementById( 'recordEggs' ),
 		countEggsNum = countEggs.innerHTML,
-		recordEggsNum = recordEggs.innerHTML;
+		recordEggsNum = recordEggs.innerHTML,
+		intervalMotionRadBack;
 
 		_posCatchRadX = canvas.width + 10,
 		_posCatchRadY = canvas.height - 30,
-		_posCatchRadW = 10,
+		_posCatchRadW = 30,
 		_posCatchRadH = 30;
 
 	function dgawRadCatch( _posCatchRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH ){
@@ -168,6 +169,7 @@ window.onload = function(){
 			console.log( 'Промах' );
 			clearInterval( motionRect );
 			keyRect = false;
+			mechanismAngle.createMechanismAngle();
 		} else{
 			if( this.y > canvas.height - _posCatchRadH - 30 && this.x > fieldCatchX && this.x < fieldCatchX + fieldCatchSize ){
 				console.log( 'Попал' );
@@ -179,9 +181,21 @@ window.onload = function(){
 				if( recordEggsNum < countEggsNum ){
 					recordEggs.innerHTML = countEggsNum;
 				}
+
+				intervalMotionRadBack = setInterval( function(){
+					if( _posCatchRadX < canvas.width + 10 ){
+						_posCatchRadX += 6;
+						clearContext();
+						dgawRadCatch( _posCatchRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH );
+					} else{
+						clearInterval( intervalMotionRadBack );
+						MotionRadFront();
+					}
+
+				},30 );
+
 			}		 	
-		}
-		
+		}		
 	}
 
 	clearContext();
@@ -205,7 +219,7 @@ window.onload = function(){
 		/* draw rad */
 		dgawRadCatch( _posCatchRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH );
 
-		canvas.onmousedown = function(){			
+		canvas.onmousedown = function(){
 
 			var mousePosition = PositionMouse( event );
 
@@ -245,8 +259,6 @@ window.onload = function(){
 				}		
 			}			
 		}
-
-		mechanismAngle.createMechanismAngle();
 
 		canvas.onmouseup = function(){
 			canvas.style.cursor = 'default';
@@ -300,10 +312,9 @@ window.onload = function(){
 					dgawRadCatch( _posCatchRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH );
 
 					flight.powerFlight();					
-					mechanismAngle.createMechanismAngle( angleSight );
 					setTimeout( function(){
 						angleSight = 15;
-						mechanismAngle.createMechanismAngle( angleSight );
+						//mechanismAngle.createMechanismAngle( angleSight );
 					},500 );					
 				},30 );
 				keyShot = false;
@@ -314,10 +325,7 @@ window.onload = function(){
 /*******************************************************************************
 *********************************** Catch ***************************************
 ********************************************************************************/	
-	var positionCatchRad = RandomNumber( 300, canvas.width - 20 ),
-		motionCatcher;
-
-
+	var motionCatcher;
 
 	function PositionCatch( posCatchRadX ){
 		this.x = posCatchRadX;
@@ -331,12 +339,14 @@ window.onload = function(){
 		} else{
 			clearInterval( motionCatcher );
 			_posCatchRadX = this.posRadX;
+			
+			mechanismAngle.createMechanismAngle();
 
 			/*** Sight ***/
 			DirectedToTarget();
 
 			/*** Shot ***/		
-			Shot();
+			Shot();			
 		}
 
 		dgawRadCatch( this.posRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH );
@@ -344,26 +354,94 @@ window.onload = function(){
 
 	/*** Catch rad ***/	
 	function MotionRadFront(){
+		var positionCatchRad = RandomNumber( 300, canvas.width - 20 );
 		var rad = new PositionCatch( positionCatchRad );
 
 		motionCatcher = setInterval( function(){
 			clearContext();
 			rad.catchMotion();
 		},30 );
+	}	
+
+/*******************************************************************************
+*********************************** Start game *********************************
+********************************************************************************/
+
+	var timeCount = document.getElementById( 'timeCount' ),
+		mxStart = document.getElementById( 'mxStart' ),
+		mxControlPanel = document.getElementById( 'mxControlPanel' ),
+		keyStart = false,
+		keyFirstBg = true,
+		timeGameNum = 50,
+		timeGame = timeGameNum;
+
+	function StartBG(){
+		if( keyFirstBg == true ){
+			c.fillStyle = '#333';
+			c.fillRect( 0, 0, canvas.width, canvas.height );
+			c.fill();
+
+			c.fillStyle = '#fff';
+			c.font = '40px Arial';
+			c.fillText( 'НАЧАТЬ ИГРУ', 300, 200 );
+			keyFirstBg = false;
+		} else{
+			c.fillStyle = '#333';
+			c.fillRect( 0, 0, canvas.width, canvas.height );
+			c.fill();
+
+			c.fillStyle = '#fff';
+			c.font = '30px Arial';
+			c.fillText( 'НАЧАТЬ ИГРУ ЗАНОВО. РЕКОРД - ' + recordEggs.innerHTML + ' ПОПАДАНИЙ!', 60, 200 );
+		}
+		
 	}
 
-	function MotionRadBack(){
+	function StartGame(){
+		StartBG();
+		mxStart.onclick = function(){
+			if( keyStart == false ){
+				keyStart = true;
+				mxStart.style.display = 'none';
+				mxControlPanel.style.display = 'block';
+				MotionRadFront();
+				var timeGamePeriod = setInterval( function(){
+					if ( timeGame > 0 ){
+						timeGame--;
+					} else{
+						clearInterval( motionRect );
+						clearInterval( intervalMotionRadBack );
+						clearInterval( changePowerPeriod );
+						clearInterval( motionCatcher );
+						clearInterval( timeGamePeriod );						
+						StartBG();
+						mxStart.style.display = 'table';
+						mxControlPanel.style.display = 'none';
+						countEggs.innerHTML = 0;						
+						timeGame = timeGameNum;
+						canvas.onmousemove = function(){
+							return;
+						}
+						_posCatchRadX = canvas.width + 10;
+						keyStart = false;
+					}
+					timeCount.innerHTML = timeGame;
+				},1000 );
+				
 
+			}				
+		}		
 	}
-	
 
 /*******************************************************************************
 *********************************** Init ***************************************
 ********************************************************************************/
-	function init(){
-		MotionRadFront();
-	}
 	
-	init();	
+
+	function init(){
+		StartGame();
+	}	
+
+	init();
 
 }
