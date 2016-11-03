@@ -1,32 +1,23 @@
 window.onload = function(){
 
+/*******************************************************************************
+*********************************** vars ***************************************
+********************************************************************************/
+	/*** Init ***/
 	var canvas = document.getElementById( 'canvas' ),
 		c = canvas.getContext( '2d' ),
 		canvasLeft = canvas.getBoundingClientRect().left,
-		canvasTop = canvas.getBoundingClientRect().top,
-		motionRect,
-		keyRect = false,
-		TWO_PI = Math.PI * 2,
-		SightX = 0,
-		SightY = 0,
-		SightSize = 15,
-		angleSight = 15;
+		canvasTop = canvas.getBoundingClientRect().top;
 
-	/*** Clear rect ***/
-	function clearContext(){
-		c.fillStyle = 'black';
-		c.fillRect( 0, 0, canvas.width, canvas.height );
-	}
+	/*** Srart game ***/
+	var timeCount = document.getElementById( 'timeCount' ),
+		mxStart = document.getElementById( 'mxStart' ),
+		mxControlPanel = document.getElementById( 'mxControlPanel' ),
+		keyStart = false,
+		keyFirstBg = true,
+		timeGame = 20;
 
-	/*** Random number ***/
-	function RandomNumber( from, to ){
-		return Math.floor( ( Math.random() * ( to - from + 1 ) ) + from );
-	}
-
-/*******************************************************************************
-**************************** Dgaw rad-catch ************************************
-********************************************************************************/
-
+	/*** Dgaw rad-catch ***/
 	var countEggs = document.getElementById( 'countEggs' ),
 		recordEggs = document.getElementById( 'recordEggs' ),
 		countEggsNum = countEggs.innerHTML,
@@ -38,6 +29,37 @@ window.onload = function(){
 		_posCatchRadW = 30,
 		_posCatchRadH = 30;
 
+	/*** Shot ***/
+	var throwButton = document.getElementById( 'mx-throw' ),
+		powerLine = document.getElementById( 'mx-power_line' ),
+		powerSize = 10,
+		changePower = 0,			
+		changePowerPeriod,
+		keyShot = false,
+		motionRect,
+		keyRect = false,
+		TWO_PI = Math.PI * 2,
+		SightX = 0,
+		SightY = 0,
+		SightSize = 15,
+		angleSight = 15;
+
+/*******************************************************************************
+**************************** Subsidiary functions ******************************
+********************************************************************************/
+
+	/*** Clear rect ***/
+	function clearContext(){
+		c.fillStyle = 'black';
+		c.fillRect( 0, 0, canvas.width, canvas.height );
+	}
+
+	/*** Random number ***/
+	function RandomNumber( from, to ){
+		return Math.floor( ( Math.random() * ( to - from + 1 ) ) + from );
+	}
+	
+	/*** Dgaw rad-catch ***/
 	function dgawRadCatch( _posCatchRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH ){
 		c.fillStyle = '#fff';
 		c.fillRect( _posCatchRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH );
@@ -194,14 +216,16 @@ window.onload = function(){
 
 				},30 );
 
-			}		 	
-		}		
+				throwButton.onmousedown = function(){
+					return;
+				}
+
+			}
+		}
 	}
 
-	clearContext();
-
 /*******************************************************************************
-*********************************** SHOT ***************************************
+************************ Directed to target and shot ***************************
 ********************************************************************************/
 
 	var mechanismAngle = new MechanismAngle( 0, canvas.height, 100 );
@@ -266,17 +290,9 @@ window.onload = function(){
 				return;
 			}
 		}
-	}
-	
+	}	
 
 	/*** Shot ***/
-	var throwButton = document.getElementById( 'mx-throw' ),
-		powerLine = document.getElementById( 'mx-power_line' ),
-		powerSize = 10,
-		changePower = 0,			
-		changePowerPeriod,
-		keyShot = false;
-
 	function Shot(){
 		throwButton.onmousedown = function(){
 			if( keyRect == false ){
@@ -367,14 +383,6 @@ window.onload = function(){
 *********************************** Start game *********************************
 ********************************************************************************/
 
-	var timeCount = document.getElementById( 'timeCount' ),
-		mxStart = document.getElementById( 'mxStart' ),
-		mxControlPanel = document.getElementById( 'mxControlPanel' ),
-		keyStart = false,
-		keyFirstBg = true,
-		timeGameNum = 50,
-		timeGame = timeGameNum;
-
 	function StartBG(){
 		if( keyFirstBg == true ){
 			c.fillStyle = '#333';
@@ -405,9 +413,11 @@ window.onload = function(){
 				mxStart.style.display = 'none';
 				mxControlPanel.style.display = 'block';
 				MotionRadFront();
-				var timeGamePeriod = setInterval( function(){
-					if ( timeGame > 0 ){
-						timeGame--;
+
+				var _time = timeGame;
+				var timeGamePeriod = setInterval( function(){					
+					if ( _time > 0 ){
+						_time--;
 					} else{
 						clearInterval( motionRect );
 						clearInterval( intervalMotionRadBack );
@@ -417,17 +427,18 @@ window.onload = function(){
 						StartBG();
 						mxStart.style.display = 'table';
 						mxControlPanel.style.display = 'none';
-						countEggs.innerHTML = 0;						
-						timeGame = timeGameNum;
+						recordEggsNum = recordEggs.innerHTML;
+						countEggs.innerHTML = 0;
+						countEggsNum = 0;
+						_time = timeGame;
 						canvas.onmousemove = function(){
 							return;
 						}
 						_posCatchRadX = canvas.width + 10;
 						keyStart = false;
 					}
-					timeCount.innerHTML = timeGame;
+					timeCount.innerHTML = _time;
 				},1000 );
-				
 
 			}				
 		}		
