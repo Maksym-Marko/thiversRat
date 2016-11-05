@@ -15,19 +15,19 @@ window.onload = function(){
 		mxControlPanel = document.getElementById( 'mxControlPanel' ),
 		keyStart = false,
 		keyFirstBg = true,
-		timeGame = 20;
+		timeGame = 60;
 
-	/*** Dgaw rad-catch ***/
+	/*** Dgaw rat-catch ***/
 	var countEggs = document.getElementById( 'countEggs' ),
 		recordEggs = document.getElementById( 'recordEggs' ),
 		countEggsNum = countEggs.innerHTML,
 		recordEggsNum = recordEggs.innerHTML,
-		intervalMotionRadBack;
+		intervalMotionRatBack;
 
-		_posCatchRadX = canvas.width + 10,
-		_posCatchRadY = canvas.height - 30,
-		_posCatchRadW = 30,
-		_posCatchRadH = 30;
+		_posCatchRatX = canvas.width + 10,
+		_posCatchRatY = canvas.height - 40,
+		_posCatchRatW = 10,
+		_posCatchRatH = 30;
 
 	/*** Shot ***/
 	var throwButton = document.getElementById( 'mx-throw' ),
@@ -41,17 +41,146 @@ window.onload = function(){
 		TWO_PI = Math.PI * 2,
 		SightX = 0,
 		SightY = 0,
-		SightSize = 15,
+		SightSize = 20,
 		angleSight = 15;
 
+	/*** Sprites ***/
+	var allSprites = {};
+
+/*******************************************************************************
+*********************************** Sprites ************************************
+********************************************************************************/
+	// Sprites
+	var img = new Image();
+	img.src = 'img/sprite.png';
+
+	// Bg
+	var imgBg = new Image();
+	imgBg.src = 'img/bg1.png';
+
+	function Sprite( img, imgX, imgY, imgW, imgH, ctxX, ctxY, ctxW, ctxH ){
+		this.img = img;
+		this.imgX = imgX;
+		this.imgY = imgY;
+		this.imgW = imgW;
+		this.imgH = imgH;
+
+		this.ctxX = ctxX;
+		this.ctxY = ctxY;
+		this.ctxW = ctxW;
+		this.ctxH = ctxH;
+	}
+
+	Sprite.prototype.draw = function(){
+		c.drawImage( this.img, this.imgX, this.imgY, this.imgW, this.imgH,
+						this.ctxX, this.ctxY, this.ctxW, this.ctxH );
+	}
+
+	// Background
+	function BgCanvas(){
+		allSprites.bg = [ new Sprite( imgBg, 0, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height ) ];
+		allSprites.bg[0].draw();
+	}
+
+	// Older rat Stands
+	var ros = 0;
+	function RatOlderStands(){
+		allSprites.ratOlderStands = [
+			new Sprite( img, 39, 120, 41, 41, 0, canvas.height - 41, 41, 41 ),
+			new Sprite( img, 86, 120, 41, 41, 0, canvas.height - 41, 41, 41 )
+		];
+		ros += 0.20;
+		rosN = parseInt( ros );
+		if( rosN > 1 ){
+			ros = 0;
+			rosN = 0;
+		}
+		allSprites.ratOlderStands[rosN].draw();
+	}
+	
+	// Older rat Stands whit egg
+	function RatOlderThrows(){
+		allSprites.ratOlderThrows = [ new Sprite( img, 0, 120, 41, 41, 0, canvas.height - 41, 41, 41 ) ];
+		allSprites.ratOlderThrows[0].draw();
+	}
+
+	// Draw Sight
+	function ВrawSight( sigX, sigY, sigNewW, sigNewH ){
+		allSprites.drSight = [ new Sprite( img, 0, 161, 41, 41, sigX, sigY, 50, 50 ) ];
+		allSprites.drSight[0].draw();
+	}
+
+	// Egg Flies
+	var eggf = 0;
+	function EggFlies( eggX, eggY ){
+		
+		allSprites.eggFlies = [ new Sprite( img, 3, 80, 22, 22, eggX, eggY, 22, 22 ),
+								new Sprite( img, 27, 80, 22, 22, eggX, eggY, 22, 22)
+		];
+
+		eggf += 0.20;
+		eggfN = parseInt( eggf );
+		if( eggfN > 1 ){
+			eggf = 0;
+			eggfN = 0;
+		}
+		
+		allSprites.eggFlies[eggfN].draw();
+	}
+	
+	// Egg Broken
+	function EggBroken( eggBrX, eggBrY ){
+		allSprites.eggBroken = [ new Sprite( img, 54, 79, 40, 30, eggBrX, eggBrY, 40, 30 ) ];
+		allSprites.eggBroken[0].draw();
+	}
+
+	// Rat Jr Without Egg
+	var rjWoE = 0;
+	function RatJrWithoutEgg( rjwoeX, rjwoeY ){
+		allSprites.ratJrWithoutEgg = [ new Sprite( img, 0, 0, 38, 40, rjwoeX, rjwoeY, 38, 40 ),
+								new Sprite( img, 38, 0, 38, 40, rjwoeX, rjwoeY, 38, 40)
+		];
+
+		rjWoE += 0.05;
+		rjWoEN = parseInt( rjWoE );
+		if( rjWoEN > 1 ){
+			rjWoE = 0;
+			rjWoEN = 0;
+		}
+
+		allSprites.ratJrWithoutEgg[rjWoEN].draw();
+	}
+
+	// Rat Jr Whit Egg
+	var rjWiE = 0;
+	function RatJrWhitEgg( rjwieX, rjwieY ){
+		allSprites.ratJrWhitEgg = [ new Sprite( img, 0, 40, 34, 40, rjwieX, rjwieY, 34, 40 ),
+								new Sprite( img, 35, 40, 34, 40, rjwieX, rjwieY, 34, 40)
+		];
+
+		rjWiE += 0.10;
+		rjWiEN = parseInt( rjWiE );
+		if( rjWiEN > 1 ){
+			rjWiE = 0;
+			rjWiEN = 0;
+		}
+
+		allSprites.ratJrWhitEgg[rjWiEN].draw();
+	}
+
+	// rat Jr Stand
+	function RatJrStand( ratJSX, ratJSY ){
+		allSprites.ratJrStand = [ new Sprite( img, 89, 0, 25, 40, ratJSX, ratJSY, 25, 44 ) ];
+		allSprites.ratJrStand[0].draw();
+	}
+	
 /*******************************************************************************
 **************************** Subsidiary functions ******************************
 ********************************************************************************/
 
 	/*** Clear rect ***/
-	function clearContext(){
-		c.fillStyle = 'black';
-		c.fillRect( 0, 0, canvas.width, canvas.height );
+	function clearContext(){		
+		BgCanvas();
 	}
 
 	/*** Random number ***/
@@ -59,11 +188,9 @@ window.onload = function(){
 		return Math.floor( ( Math.random() * ( to - from + 1 ) ) + from );
 	}
 	
-	/*** Dgaw rad-catch ***/
-	function dgawRadCatch( _posCatchRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH ){
-		c.fillStyle = '#fff';
-		c.fillRect( _posCatchRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH );
-		c.fill();
+	/*** Dgaw rat-catch ***/
+	function dgawRatCatch( _posCatchRatX, _posCatchRatY, _posCatchRatW, _posCatchRatH ){		
+		RatJrStand( _posCatchRatX, _posCatchRatY );
 	}
 
 /*******************************************************************************
@@ -72,33 +199,23 @@ window.onload = function(){
 
 	/*** Change angle ***/
 
-	function MechanismAngle( mX, mY, mRadius ){
+	function MechanismAngle( mX, mY, mRatius ){
 		this.x = mX;
 		this.y = mY;
-		this.radius = mRadius;
+		this.ratius = mRatius;
 	}
 
 	MechanismAngle.prototype.createMechanismAngle = function( angleSight ){			
-		c.beginPath();
-		c.strokeStyle = '#fff';
-		c.arc( this.x, this.y, this.radius, 0, TWO_PI, false );
-		//c.stroke();
-		c.closePath();
-
+		
 		/* Sight */
 		angleSight = angleSight || 15;
-		sX = this.x + this.radius * Math.cos( TWO_PI * ( angleSight - 20 ) / 100 ); // 1 - 15
-		sY = this.y + this.radius * Math.sin( TWO_PI * ( angleSight - 20 ) / 100 ); // 1 - 15
+		sX = this.x + this.ratius * Math.cos( TWO_PI * ( angleSight - 20 ) / 100 ); // 1 - 15
+		sY = this.y + this.ratius * Math.sin( TWO_PI * ( angleSight - 20 ) / 100 ); // 1 - 15
 
-		c.beginPath();
-		c.fillStyle = '#fff';
-		c.fillRect( sX, sY, SightSize, SightSize );
-		c.fill();
-		c.closePath();
+		ВrawSight( sX, sY, SightSize, SightSize );
 
 		SightX = sX;
 		SightY = sY;
-
 	}
 
 	/*** Flight rect ***/
@@ -179,21 +296,20 @@ window.onload = function(){
 			}
 		}
 
-		c.fillStyle = '#fff';
-		c.fillRect( this.x, this.y, 5, 5 );
-		c.fill();
+		EggFlies( this.x, this.y )
 
-		fieldCatchX = _posCatchRadX - 30,
-		fieldCatchSize = 30 + _posCatchRadW;
+		fieldCatchX = _posCatchRatX - 5,
+		fieldCatchSize = 5 + _posCatchRatW;
 
 		if( this.y > canvas.height && this.x < fieldCatchX ||
 			this.y > canvas.height && this.x > fieldCatchX + fieldCatchSize	){
 			console.log( 'Промах' );
 			clearInterval( motionRect );
-			keyRect = false;
 			mechanismAngle.createMechanismAngle();
+			keyRect = false;
+			EggBroken( this.x, this.y - 30 );	
 		} else{
-			if( this.y > canvas.height - _posCatchRadH - 30 && this.x > fieldCatchX && this.x < fieldCatchX + fieldCatchSize ){
+			if( this.y > canvas.height - _posCatchRatH - 30 && this.x > fieldCatchX && this.x < fieldCatchX + fieldCatchSize ){
 				console.log( 'Попал' );
 				clearInterval( motionRect );
 				keyRect = false;
@@ -204,15 +320,16 @@ window.onload = function(){
 					recordEggs.innerHTML = countEggsNum;
 				}
 
-				intervalMotionRadBack = setInterval( function(){
-					if( _posCatchRadX < canvas.width + 10 ){
-						_posCatchRadX += 6;
+				intervalMotionRatBack = setInterval( function(){
+					if( _posCatchRatX < canvas.width + 10 ){
+						_posCatchRatX += 6;
 						clearContext();
-						dgawRadCatch( _posCatchRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH );
+						RatJrWhitEgg( _posCatchRatX, _posCatchRatY );
 					} else{
-						clearInterval( intervalMotionRadBack );
-						MotionRadFront();
+						clearInterval( intervalMotionRatBack );
+						MotionRatFront();
 					}
+					RatOlderStands();
 
 				},30 );
 
@@ -240,8 +357,8 @@ window.onload = function(){
 
 	/*** Directed to target ***/
 	function DirectedToTarget(){
-		/* draw rad */
-		dgawRadCatch( _posCatchRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH );
+		/* draw rat */
+		dgawRatCatch( _posCatchRatX, _posCatchRatY, _posCatchRatW, _posCatchRatH );
 
 		canvas.onmousedown = function(){
 
@@ -257,9 +374,8 @@ window.onload = function(){
 				canvas.style.cursor = 'pointer';		
 				canvas.onmousemove = function(){		
 					clearContext();
-
-					/* draw rad */
-					dgawRadCatch( _posCatchRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH );
+					RatOlderThrows();
+					RatJrStand( _posCatchRatX, _posCatchRatY );
 
 					mouseXin = event.pageY - canvasTop;
 					if( mouseXin < SightY ){
@@ -273,7 +389,7 @@ window.onload = function(){
 							angleSight = 15;
 						}
 					}				
-					mechanismAngle.createMechanismAngle( angleSight );
+					mechanismAngle.createMechanismAngle( angleSight );			
 				}
 				canvas.onmouseleave = function(){
 					canvas.style.cursor = 'default';
@@ -324,17 +440,17 @@ window.onload = function(){
 				motionRect = setInterval( function(){
 					clearContext();
 
-					/* draw rad */
-					dgawRadCatch( _posCatchRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH );
+					// Rat stands					
+					RatOlderStands();
+					RatJrStand( _posCatchRatX, _posCatchRatY );
 
 					flight.powerFlight();					
 					setTimeout( function(){
-						angleSight = 15;
-						//mechanismAngle.createMechanismAngle( angleSight );
+						angleSight = 15;						
 					},500 );					
 				},30 );
 				keyShot = false;
-			}
+			}			
 		}
 	}
 
@@ -343,18 +459,18 @@ window.onload = function(){
 ********************************************************************************/	
 	var motionCatcher;
 
-	function PositionCatch( posCatchRadX ){
-		this.x = posCatchRadX;
-		this.posRadX = _posCatchRadX;
+	function PositionCatch( posCatchRatX ){
+		this.x = posCatchRatX;
+		this.posRatX = _posCatchRatX;
 	}
 
 	PositionCatch.prototype.catchMotion = function(){		
 
-		if( this.posRadX >= this.x ){
-			this.posRadX -= 14;
+		if( this.posRatX >= this.x ){
+			this.posRatX -= 14;
 		} else{
 			clearInterval( motionCatcher );
-			_posCatchRadX = this.posRadX;
+			_posCatchRatX = this.posRatX;
 			
 			mechanismAngle.createMechanismAngle();
 
@@ -362,20 +478,21 @@ window.onload = function(){
 			DirectedToTarget();
 
 			/*** Shot ***/		
-			Shot();			
+			Shot();	
+			RatOlderThrows();		
 		}
 
-		dgawRadCatch( this.posRadX, _posCatchRadY, _posCatchRadW, _posCatchRadH );
+		RatJrStand( this.posRatX, _posCatchRatY );
 	}
 
-	/*** Catch rad ***/	
-	function MotionRadFront(){
-		var positionCatchRad = RandomNumber( 300, canvas.width - 20 );
-		var rad = new PositionCatch( positionCatchRad );
+	/*** Catch rat ***/	
+	function MotionRatFront(){
+		var positionCatchRat = RandomNumber( 300, canvas.width - 20 );
+		var rat = new PositionCatch( positionCatchRat );
 
 		motionCatcher = setInterval( function(){
 			clearContext();
-			rad.catchMotion();
+			rat.catchMotion();
 		},30 );
 	}	
 
@@ -400,7 +517,7 @@ window.onload = function(){
 
 			c.fillStyle = '#fff';
 			c.font = '30px Arial';
-			c.fillText( 'НАЧАТЬ ИГРУ ЗАНОВО. РЕКОРД - ' + recordEggs.innerHTML + ' ПОПАДАНИЙ!', 60, 200 );
+			c.fillText( 'НАЧАТЬ ИГРУ ЗАНОВО. РЕКОРД - ' + recordEggs.innerHTML + ' УКРАДЕННЫХ ЯИЦ!', 60, 200 );
 		}
 		
 	}
@@ -412,7 +529,7 @@ window.onload = function(){
 				keyStart = true;
 				mxStart.style.display = 'none';
 				mxControlPanel.style.display = 'block';
-				MotionRadFront();
+				MotionRatFront();
 
 				var _time = timeGame;
 				var timeGamePeriod = setInterval( function(){					
@@ -420,7 +537,7 @@ window.onload = function(){
 						_time--;
 					} else{
 						clearInterval( motionRect );
-						clearInterval( intervalMotionRadBack );
+						clearInterval( intervalMotionRatBack );
 						clearInterval( changePowerPeriod );
 						clearInterval( motionCatcher );
 						clearInterval( timeGamePeriod );						
@@ -434,7 +551,7 @@ window.onload = function(){
 						canvas.onmousemove = function(){
 							return;
 						}
-						_posCatchRadX = canvas.width + 10;
+						_posCatchRatX = canvas.width + 10;
 						keyStart = false;
 					}
 					timeCount.innerHTML = _time;
@@ -453,6 +570,6 @@ window.onload = function(){
 		StartGame();
 	}	
 
-	init();
-
+	init();	
+		
 }
